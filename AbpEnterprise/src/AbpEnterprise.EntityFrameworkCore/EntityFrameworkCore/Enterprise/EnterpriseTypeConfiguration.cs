@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 
 namespace AbpEnterprise.EntityFrameworkCore.Enterprise
 {
@@ -13,7 +14,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
     {
         public void Configure(EntityTypeBuilder<EnterpriseType> builder)
         {
-            builder.ToTable("EnterpriseTypes");
+            builder.ToTable(AbpEnterpriseConsts.DbTablePrefix + "EnterpriseTypes");
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Name)
@@ -23,11 +24,11 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
             builder.Property(e => e.Description)
                 .HasMaxLength(500);
 
-            // Cấu hình quan hệ 1-n
             builder.HasMany(e => e.Industries)
                 .WithOne()
                 .HasForeignKey("EnterpriseTypeId")
-                .OnDelete(DeleteBehavior.Cascade); // Xóa EnterpriseType sẽ xóa tất cả EnterpriseIndustry liên quan
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.ConfigureByConvention();
         }
     }
 }

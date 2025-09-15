@@ -13,7 +13,7 @@ namespace AbpEnterprise.Enterprises
     {
         public string Name { get; private set; } 
         public string Description { get; private set; } 
-        private readonly List<EnterpriseIndustry> _industries; 
+        private readonly List<EnterpriseIndustry> _industries = new(); 
         public IReadOnlyCollection<EnterpriseIndustry> Industries => _industries.AsReadOnly();
 
         protected EnterpriseType()

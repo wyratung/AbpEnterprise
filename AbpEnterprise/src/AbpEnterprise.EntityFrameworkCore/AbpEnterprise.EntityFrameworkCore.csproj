@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AbpEnterprise.Domain\AbpEnterprise.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="9.3.2" />
     <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="9.3.2" />
     <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="9.3.2" />
@@ -33,6 +29,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>compile; contentFiles; build; buildMultitargeting; buildTransitive; analyzers; native</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AbpEnterprise.Domain\AbpEnterprise.Domain.csproj" />
   </ItemGroup>
 
 </Project>

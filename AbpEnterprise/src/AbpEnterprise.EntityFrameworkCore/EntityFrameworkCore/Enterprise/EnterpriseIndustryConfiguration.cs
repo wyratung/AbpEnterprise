@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 
 namespace AbpEnterprise.EntityFrameworkCore.Enterprise
 {
@@ -13,7 +14,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
     {
         public void Configure(EntityTypeBuilder<EnterpriseIndustry> builder)
         {
-            builder.ToTable("EnterpriseIndustries");
+            builder.ToTable(AbpEnterpriseConsts.DbTablePrefix + "EnterpriseIndustries");
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.IndustryName)
@@ -23,6 +24,8 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
             builder.Property(e => e.IndustryCode)
                 .IsRequired()
                 .HasMaxLength(50);
+
+            builder.ConfigureByConvention();
         }
     }
 }
