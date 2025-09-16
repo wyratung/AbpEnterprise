@@ -38,13 +38,7 @@ namespace AbpEnterprise.NewFolder
 
         }
 
-        public async Task<EnterpriseTypeDto> UpdateAsync(Guid id, UpdateEnterpriseTypeDto input)
-        {
-            var enterpriseType = await _enterpriseTypeRepository.GetAsync(id);
-            enterpriseType.Update(input.Name, input.Description);
-            await _enterpriseTypeRepository.UpdateAsync(enterpriseType);
-            return ObjectMapper.Map<EnterpriseType, EnterpriseTypeDto>(enterpriseType);
-        }
+        
 
         public async Task AddIndustryAsync(Guid enterpriseTypeId, CreateEnterpriseIndustrieDto input)
         {

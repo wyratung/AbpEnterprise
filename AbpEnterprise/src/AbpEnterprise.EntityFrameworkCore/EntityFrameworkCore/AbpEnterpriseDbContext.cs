@@ -33,6 +33,7 @@ public class AbpEnterpriseDbContext :
     public DbSet<Book> Books { get; set; }
     public DbSet<EnterpriseType> EnterpriseTypes { get; set; }
     public DbSet<EnterpriseIndustry> EnterpriseIndustries { get; set; }
+    public DbSet<Author> Authors { get; set; }
 
     #region Entities from the modules
 
@@ -91,11 +92,26 @@ public class AbpEnterpriseDbContext :
                 AbpEnterpriseConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
             b.Property(x => x.Name).IsRequired().HasMaxLength(128);
-        });
 
+            // ADD THE MAPPING FOR THE RELATION
+            b.HasOne<Author>().WithMany().HasForeignKey(x => x.AuthorId).IsRequired();
+        });
+        builder.Entity<Author>(b =>
+        {
+            b.ToTable(AbpEnterpriseConsts.DbTablePrefix + "Authors",
+                AbpEnterpriseConsts.DbSchema);
+
+            b.ConfigureByConvention();
+
+            b.Property(x => x.Name)
+                .IsRequired()
+                .HasMaxLength(AuthorConsts.MaxNameLength);
+
+            b.HasIndex(x => x.Name);
+        });
         builder.ApplyConfiguration(new EnterpriseTypeConfiguration());
         builder.ApplyConfiguration(new EnterpriseIndustryConfiguration());
-        //builder.ApplyConfigurationsFromAssembly(typeof(AbpEnterpriseDbContext).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(AbpEnterpriseDbContext).Assembly);
 
         /* Configure your own tables/entities inside here */
 

@@ -15,14 +15,14 @@ namespace AbpEnterprise.Enterprises
 
         protected EnterpriseIndustry() { }
 
-        public EnterpriseIndustry(Guid id, Guid enterpriseTypeId, string industryName, string industryCode) : base(id)
+        internal EnterpriseIndustry(Guid id, Guid enterpriseTypeId, string industryName, string industryCode) : base(id)
         {
             EnterpriseTypeId = enterpriseTypeId;
             IndustryName = industryName ?? throw new ArgumentNullException(nameof(industryName));
             IndustryCode = industryCode ?? throw new ArgumentNullException(nameof(industryCode));
         }
 
-        public void Update(string industryName, string industryCode)
+        internal void Update(string industryName, string industryCode)
         {
             IndustryName = industryName ?? throw new ArgumentNullException(nameof(industryName));
             IndustryCode = industryCode ?? throw new ArgumentNullException(nameof(industryCode));

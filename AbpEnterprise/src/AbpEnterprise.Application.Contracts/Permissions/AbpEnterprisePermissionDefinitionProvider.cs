@@ -17,6 +17,15 @@ public class AbpEnterprisePermissionDefinitionProvider : PermissionDefinitionPro
         booksPermission.AddChild(AbpEnterprisePermissions.Books.Delete, L("Permission:Books.Delete"));
         //Define your own permissions here. Example:
         //myGroup.AddPermission(AbpEnterprisePermissions.MyPermission1, L("Permission:MyPermission1"));
+
+        var authorsPermission = myGroup.AddPermission(
+    AbpEnterprisePermissions.Authors.Default, L("Permission:Authors"));
+        authorsPermission.AddChild(
+            AbpEnterprisePermissions.Authors.Create, L("Permission:Authors.Create"));
+        authorsPermission.AddChild(
+            AbpEnterprisePermissions.Authors.Edit, L("Permission:Authors.Edit"));
+        authorsPermission.AddChild(
+            AbpEnterprisePermissions.Authors.Delete, L("Permission:Authors.Delete"));
     }
 
     private static LocalizableString L(string name)
