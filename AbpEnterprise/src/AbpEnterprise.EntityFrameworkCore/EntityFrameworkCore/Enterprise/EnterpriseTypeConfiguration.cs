@@ -12,23 +12,25 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
 {
     public class EnterpriseTypeConfiguration : IEntityTypeConfiguration<EnterpriseType>
     {
-        public void Configure(EntityTypeBuilder<EnterpriseType> builder)
+        public void Configure(EntityTypeBuilder<EnterpriseType> b)
         {
-            builder.ToTable(AbpEnterpriseConsts.DbTablePrefix + "EnterpriseTypes");
-            builder.HasKey(e => e.Id);
+            b.ToTable(AbpEnterpriseConsts.DbTablePrefix + "EnterpriseTypes");
+            b.ConfigureByConvention();
 
-            builder.Property(e => e.Name)
+            b.Property(x => x.Name)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(EnterpriseTypeConsts.MaxNameLength);
 
-            builder.Property(e => e.Description)
-                .HasMaxLength(500);
+            b.Property(x => x.Code)
+                .IsRequired()
+                .HasMaxLength(EnterpriseTypeConsts.MaxCodeLength);
 
-            builder.HasMany(e => e.Industries)
-                .WithOne()
-                .HasForeignKey("EnterpriseTypeId")
-                .OnDelete(DeleteBehavior.Cascade);
-            builder.ConfigureByConvention();
+            b.Property(x => x.Description)
+                .HasMaxLength(EnterpriseTypeConsts.MaxDescriptionLength);
+
+            b.HasIndex(x => new { x.EnterpriseIndustryId, x.Code }).IsUnique();
+            b.HasIndex(x => x.Name);
+            b.HasIndex(x => x.IsActive);
         }
     }
 }

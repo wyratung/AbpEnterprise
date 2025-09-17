@@ -5,6 +5,7 @@ using Volo.Abp.SettingManagement;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.TenantManagement;
+using Volo.Abp.Application;
 
 namespace AbpEnterprise;
 

@@ -10,16 +10,24 @@ public class AbpEnterpriseApplicationAutoMapperProfile : Profile
     {
         CreateMap<Book, BookDto>();
         CreateMap<CreateUpdateBookDto, Book>();
-        CreateMap<EnterpriseType, EnterpriseTypeDto>();
-        CreateMap<EnterpriseIndustry, EnterpriseIndustrieDto>();
         CreateMap<CreateEnterpriseTypeDto, EnterpriseType>();
         CreateMap<UpdateEnterpriseTypeDto, EnterpriseType>();
-        CreateMap<CreateEnterpriseIndustrieDto, EnterpriseIndustry>();
-        CreateMap<UpdateEnterpriseIndustrieDto, EnterpriseIndustry>();
-        /* You can configure your AutoMapper mapping configuration here.
+         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
         CreateMap<Author, AuthorDto>();
         CreateMap<Author, AuthorLookupDto>();
+
+        // EnterpriseIndustry mappings
+        CreateMap<EnterpriseIndustry, EnterpriseIndustryDto>()
+            .ForMember(dest => dest.EnterpriseTypes, opt => opt.MapFrom(src => src.EnterpriseTypes));
+        CreateMap<CreateEnterpriseIndustryDto, EnterpriseIndustry>();
+        CreateMap<UpdateEnterpriseIndustryDto, EnterpriseIndustry>();
+
+        // EnterpriseType mappings
+        CreateMap<EnterpriseType, EnterpriseTypeDto>()
+            .ForMember(dest => dest.EnterpriseIndustryName, opt => opt.MapFrom(src => src.EnterpriseIndustry.Name));
+        CreateMap<CreateEnterpriseTypeDto, EnterpriseType>();
+        CreateMap<UpdateEnterpriseTypeDto, EnterpriseType>();
     }
 }

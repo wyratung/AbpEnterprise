@@ -12,20 +12,31 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
 {
     public class EnterpriseIndustryConfiguration : IEntityTypeConfiguration<EnterpriseIndustry>
     {
-        public void Configure(EntityTypeBuilder<EnterpriseIndustry> builder)
+        public void Configure(EntityTypeBuilder<EnterpriseIndustry> b)
         {
-            builder.ToTable(AbpEnterpriseConsts.DbTablePrefix + "EnterpriseIndustries");
-            builder.HasKey(e => e.Id);
+            b.ToTable(AbpEnterpriseConsts.DbTablePrefix + "EnterpriseIndustries");
+            b.ConfigureByConvention();
 
-            builder.Property(e => e.IndustryName)
+            b.Property(x => x.Name)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(EnterpriseIndustryConsts.MaxNameLength);
 
-            builder.Property(e => e.IndustryCode)
+            b.Property(x => x.Code)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(EnterpriseIndustryConsts.MaxCodeLength);
 
-            builder.ConfigureByConvention();
+            b.Property(x => x.Description)
+                .HasMaxLength(EnterpriseIndustryConsts.MaxDescriptionLength);
+
+            b.HasIndex(x => x.Code).IsUnique();
+            b.HasIndex(x => x.Name);
+            b.HasIndex(x => x.IsActive);
+
+            // Configure relationship
+            b.HasMany(x => x.EnterpriseTypes)
+                .WithOne(x => x.EnterpriseIndustry)
+                .HasForeignKey(x => x.EnterpriseIndustryId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

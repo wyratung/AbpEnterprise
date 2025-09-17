@@ -111,7 +111,7 @@ public class AbpEnterpriseDbContext :
         });
         builder.ApplyConfiguration(new EnterpriseTypeConfiguration());
         builder.ApplyConfiguration(new EnterpriseIndustryConfiguration());
-        builder.ApplyConfigurationsFromAssembly(typeof(AbpEnterpriseDbContext).Assembly);
+        //builder.ApplyConfigurationsFromAssembly(typeof(AbpEnterpriseDbContext).Assembly);
 
         /* Configure your own tables/entities inside here */
 

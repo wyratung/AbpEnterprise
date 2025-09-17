@@ -21,4 +21,19 @@ public static class AbpEnterprisePermissions
     }
     //Add your own permission names. Example:
     //public const string MyPermission1 = GroupName + ".MyPermission1";
+    public static class EnterpriseIndustries
+    {
+        public const string Default = GroupName + ".EnterpriseIndustries";
+        public const string Create = Default + ".Create";
+        public const string Update = Default + ".Update";
+        public const string Delete = Default + ".Delete";
+    }
+
+    public static class EnterpriseTypes
+    {
+        public const string Default = GroupName + ".EnterpriseTypes";
+        public const string Create = Default + ".Create";
+        public const string Update = Default + ".Update";
+        public const string Delete = Default + ".Delete";
+    }
 }

@@ -5,7 +5,7 @@ using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 
-namespace AbpEnterprise;
+namespace AbpEnterprise.DataSeeder;
 
 public class AbpEnterpriseDataSeederContributor
     : IDataSeedContributor, ITransientDependency

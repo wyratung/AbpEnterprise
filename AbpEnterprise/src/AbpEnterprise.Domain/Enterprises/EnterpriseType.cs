@@ -4,55 +4,66 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace AbpEnterprise.Enterprises
 {
-    public class EnterpriseType : AggregateRoot<Guid>
+    public class EnterpriseType : FullAuditedEntity<Guid>
     {
-        public string Name { get; private set; } 
-        public string Description { get; private set; } 
-        private readonly List<EnterpriseIndustry> _industries = new(); 
-        public IReadOnlyCollection<EnterpriseIndustry> Industries => _industries.AsReadOnly();
+        public string Name { get; private set; }
+        public string Code { get; private set; }
+        public string Description { get; private set; }
+        public bool IsActive { get; private set; }
+
+        public Guid EnterpriseIndustryId { get; private set; }
+
+        // Navigation property
+        public EnterpriseIndustry EnterpriseIndustry { get; private set; }
 
         protected EnterpriseType()
         {
-            _industries = new List<EnterpriseIndustry>();
         }
 
-        public EnterpriseType(Guid id, string name, string description) : base(id)
+        internal EnterpriseType(
+            Guid id,
+            Guid enterpriseIndustryId,
+            string name,
+            string code,
+            string description = null) : base(id)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Description = description;
-            _industries = new List<EnterpriseIndustry>();
+            EnterpriseIndustryId = enterpriseIndustryId;
+            SetName(name);
+            SetCode(code);
+            SetDescription(description);
+            IsActive = true;
         }
 
-        public void AddIndustry(Guid industryId, string industryName, string industryCode)
-        {
-            if (_industries.Any(i => i.IndustryCode == industryCode))
-            {
-                throw new Exception($"Industry with code {industryCode} already exists in this EnterpriseType.");
-            }
 
-            _industries.Add(new EnterpriseIndustry(industryId, this.Id, industryName, industryCode));
+        public void SetName(string name)
+        {
+            Name = Check.NotNullOrWhiteSpace(name, nameof(name), EnterpriseTypeConsts.MaxNameLength);
         }
 
-        public void RemoveIndustry(Guid industryId)
+        public void SetCode(string code)
         {
-            var industry = _industries.FirstOrDefault(i => i.Id == industryId);
-            if (industry == null)
-            {
-                throw new Exception($"Industry with ID {industryId} not found.");
-            }
-
-            _industries.Remove(industry);
+            Code = Check.NotNullOrWhiteSpace(code, nameof(code), EnterpriseTypeConsts.MaxCodeLength);
         }
 
-        public void Update(string name, string description)
+        public void SetDescription(string description)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Description = description;
+            Description = Check.Length(description, nameof(description), EnterpriseTypeConsts.MaxDescriptionLength);
+        }
+
+        public void Activate()
+        {
+            IsActive = true;
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
         }
     }
 }

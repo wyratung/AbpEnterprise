@@ -13,7 +13,6 @@ using Volo.Abp.Domain.Repositories;
 namespace AbpEnterprise.Books;
 
 [Authorize(AbpEnterprisePermissions.Books.Default)]
-[Authorize(AbpEnterprisePermissions.Books.Default)]
 public class BookAppService :
     CrudAppService<
         Book, //The Book entity

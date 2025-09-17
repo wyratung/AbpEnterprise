@@ -1,81 +1,119 @@
 ﻿using AbpEnterprise.Books;
+using AbpEnterprise.Enterpries.EnterpriseInterfaces;
 using AbpEnterprise.Enterprises;
+using AbpEnterprise.Enterprises.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
 using Volo.Abp.ObjectMapping;
-using System.Linq.Dynamic.Core;
 
 namespace AbpEnterprise.NewFolder
 {
-    public class EnterpriseTypeAppService : ApplicationService,IEnterpriseTypeAppService
+    [RemoteService(IsEnabled = false)]
+    public class EnterpriseTypeAppService : CrudAppService<
+        EnterpriseType,
+        EnterpriseTypeDto,
+        Guid,
+        GetEnterpriseTypesInput,
+        CreateEnterpriseTypeDto,
+        UpdateEnterpriseTypeDto>, IEnterpriseTypeAppService
     {
-        private readonly IRepository<EnterpriseType, Guid> _enterpriseTypeRepository;
+        private readonly EnterpriseIndustryManager _enterpriseIndustryManager;
+        private readonly IEnterpriseTypeRepository _enterpriseTypeRepository;
+        private readonly IEnterpriseIndustryRepository _enterpriseIndustryRepository;
 
-        public EnterpriseTypeAppService(IRepository<EnterpriseType, Guid> repository)
+        public EnterpriseTypeAppService(
+            IEnterpriseTypeRepository repository,
+            EnterpriseIndustryManager enterpriseIndustryManager,
+            IEnterpriseIndustryRepository enterpriseIndustryRepository) : base(repository)
         {
             _enterpriseTypeRepository = repository;
-        }
-        
+            _enterpriseIndustryManager = enterpriseIndustryManager;
+            _enterpriseIndustryRepository = enterpriseIndustryRepository;
 
-        public async Task<EnterpriseTypeDto> CreateAsync(CreateEnterpriseTypeDto input)
-        {
-            var enterpriseType = new EnterpriseType(GuidGenerator.Create(), input.Name, input.Description);
-            await _enterpriseTypeRepository.InsertAsync(enterpriseType);
-            return ObjectMapper.Map<EnterpriseType, EnterpriseTypeDto>(enterpriseType);
-        }
-
-        public async Task<EnterpriseTypeDto> GetAsync(Guid id)
-        {
-            var enterpriseType = await _enterpriseTypeRepository.GetAsync(id);
-            return ObjectMapper.Map<EnterpriseType, EnterpriseTypeDto>(enterpriseType);
-
+            //GetPolicyName = EnterprisePermissions.EnterpriseTypes.Default;
+            //GetListPolicyName = EnterprisePermissions.EnterpriseTypes.Default;
+            //CreatePolicyName = EnterprisePermissions.EnterpriseTypes.Create;
+            //UpdatePolicyName = EnterprisePermissions.EnterpriseTypes.Update;
+            //DeletePolicyName = EnterprisePermissions.EnterpriseTypes.Delete;
         }
 
-        
-
-        public async Task AddIndustryAsync(Guid enterpriseTypeId, CreateEnterpriseIndustrieDto input)
+        protected override async Task<IQueryable<EnterpriseType>> CreateFilteredQueryAsync(GetEnterpriseTypesInput input)
         {
-            var enterpriseType = await _enterpriseTypeRepository.GetAsync(enterpriseTypeId);
-            enterpriseType.AddIndustry(GuidGenerator.Create(), input.Name, input.Code);
-            await _enterpriseTypeRepository.UpdateAsync(enterpriseType);
+            var query = await ReadOnlyRepository.GetQueryableAsync();
+
+            return query
+                .WhereIf(input.EnterpriseIndustryId.HasValue, x => x.EnterpriseIndustryId == input.EnterpriseIndustryId.Value)
+                .WhereIf(!input.Filter.IsNullOrWhiteSpace(), x => x.Name.Contains(input.Filter) || x.Code.Contains(input.Filter))
+                .WhereIf(input.IsActive.HasValue, x => x.IsActive == input.IsActive.Value);
         }
 
-        public async Task<PagedResultDto<EnterpriseTypeDto>> GetListAsync(PagedAndSortedResultRequestDto input)
+        public override async Task<EnterpriseTypeDto> CreateAsync(CreateEnterpriseTypeDto input)
         {
-            var queryable = await _enterpriseTypeRepository.GetQueryableAsync();
-            var query = queryable
-                .OrderBy(input.Sorting.IsNullOrWhiteSpace() ? "Name" : input.Sorting)
-                .Skip(input.SkipCount)
-                .Take(input.MaxResultCount);
+            await CheckCreatePolicyAsync();
 
-            var enterpriseTypes = await AsyncExecuter.ToListAsync(query);
-            var totalCount = await AsyncExecuter.CountAsync(queryable);
+            var industry = await _enterpriseIndustryRepository.GetAsync(input.EnterpriseIndustryId);
 
-            return new PagedResultDto<EnterpriseTypeDto>(
-                totalCount,
-                ObjectMapper.Map<List<EnterpriseType>, List<EnterpriseTypeDto>>(enterpriseTypes)
+            var entity = await _enterpriseIndustryManager.CreateEnterpriseTypeAsync(
+                industry,
+                input.Name,
+                input.Code,
+                input.Description
             );
 
+            await _enterpriseIndustryRepository.UpdateAsync(industry);
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            return await MapToGetOutputDtoAsync(entity);
         }
 
-        public async Task<EnterpriseTypeDto> UpdateAsync(Guid id, CreateEnterpriseTypeDto input)
+        public override async Task<EnterpriseTypeDto> UpdateAsync(Guid id, UpdateEnterpriseTypeDto input)
         {
-            var enterpriseType = await _enterpriseTypeRepository.GetAsync(id);
-            enterpriseType.Update(input.Name, input.Description);
-            await _enterpriseTypeRepository.UpdateAsync(enterpriseType);
-            return ObjectMapper.Map<EnterpriseType, EnterpriseTypeDto>(enterpriseType);
+            await CheckUpdatePolicyAsync();
+
+            var entity = await Repository.GetAsync(id);
+
+            entity.SetName(input.Name);
+            entity.SetDescription(input.Description);            
+
+            await Repository.UpdateAsync(entity);
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            return await MapToGetOutputDtoAsync(entity);
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task ActivateAsync(Guid id)
         {
-            await _enterpriseTypeRepository.DeleteAsync(id);
+            await CheckUpdatePolicyAsync();
+
+            var entity = await Repository.GetAsync(id);
+            entity.Activate();
+            await Repository.UpdateAsync(entity);
+        }
+
+        public async Task DeactivateAsync(Guid id)
+        {
+            await CheckUpdatePolicyAsync();
+
+            var entity = await Repository.GetAsync(id);
+            entity.Deactivate();
+            await Repository.UpdateAsync(entity);
+        }
+
+        public async Task<List<EnterpriseTypeDto>> GetByIndustryIdAsync(Guid industryId)
+        {
+            await CheckGetPolicyAsync();
+
+            var entities = await _enterpriseTypeRepository.GetListByIndustryIdAsync(industryId);
+            return ObjectMapper.Map<List<EnterpriseType>, List<EnterpriseTypeDto>>(entities);
         }
     }
 }
