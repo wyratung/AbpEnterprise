@@ -15,9 +15,23 @@ namespace AbpEnterprise.Enterprises
          CreateEnterpriseIndustryDto,
          UpdateEnterpriseIndustryDto>
     {
-        Task<EnterpriseIndustryDto> GetWithDetailsAsync(Guid id);
-        Task ActivateAsync(Guid id);
-        Task DeactivateAsync(Guid id);
-        Task<List<EnterpriseIndustryDto>> GetActiveListAsync();
+        // Industry operations
+        Task<EnterpriseIndustryDto> GetWithTypesAsync(Guid id);
+        Task ActivateIndustryAsync(Guid id);
+        Task DeactivateIndustryAsync(Guid id);
+        Task<List<EnterpriseIndustryDto>> GetActiveIndustriesAsync();
+
+        // EnterpriseType operations - VIA AGGREGATE ROOT
+        Task<EnterpriseTypeDto> AddEnterpriseTypeAsync(Guid industryId, CreateEnterpriseTypeDto input);
+        Task<EnterpriseTypeDto> UpdateEnterpriseTypeAsync(Guid industryId, Guid typeId, UpdateEnterpriseTypeDto input);
+        Task RemoveEnterpriseTypeAsync(Guid industryId, Guid typeId);
+        Task ActivateEnterpriseTypeAsync(Guid industryId, Guid typeId);
+        Task DeactivateEnterpriseTypeAsync(Guid industryId, Guid typeId);
+        Task<List<EnterpriseTypeDto>> GetEnterpriseTypesByIndustryAsync(Guid industryId);
+        Task<EnterpriseTypeDto> GetEnterpriseTypeAsync(Guid industryId, Guid typeId);
+
+        // Bulk operations
+        Task<List<EnterpriseTypeDto>> AddMultipleEnterpriseTypesAsync(Guid industryId, List<CreateEnterpriseTypeDto> inputs);
+        
     }
 }

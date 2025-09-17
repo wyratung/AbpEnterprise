@@ -87,5 +87,59 @@ namespace AbpEnterprise.Enterprises
                 _enterpriseTypes.Remove(enterpriseType);
             }
         }
+        public EnterpriseType GetEnterpriseTypeByCode(string code)
+        {
+            Check.NotNullOrWhiteSpace(code, nameof(code));
+            return _enterpriseTypes.FirstOrDefault(x => x.Code == code);
+        }
+
+        public bool HasEnterpriseType(Guid typeId)
+        {
+            return _enterpriseTypes.Any(x => x.Id == typeId);
+        }
+        public EnterpriseType GetEnterpriseType(Guid typeId)
+        {
+            if(HasEnterpriseType(typeId))
+            {
+                return _enterpriseTypes.FirstOrDefault(x => x.Id == typeId);
+            }
+            return null;
+        }
+
+        public bool HasActiveEnterpriseTypes()
+        {
+            return _enterpriseTypes.Any(x => x.IsActive);
+        }
+
+        public void UpdateEnterpriseType(Guid typeId, string name, string description = null, int? sortOrder = null)
+        {
+            var enterpriseType = GetEnterpriseType(typeId);
+            if (enterpriseType == null)
+            {
+                throw new BusinessException(EnterpriseDomainErrorCodes.EnterpriseTypeNotFound);
+            }
+
+            enterpriseType.SetName(name);
+            if (description != null)
+                enterpriseType.SetDescription(description);
+           
+        }
+
+        
+
+        public List<EnterpriseType> GetActiveEnterpriseTypes()
+        {
+            return _enterpriseTypes.Where(x => x.IsActive).OrderBy(x => x.Name).ToList();
+        }
+
+        public int GetEnterpriseTypesCount()
+        {
+            return _enterpriseTypes.Count;
+        }
+
+        public int GetActiveEnterpriseTypesCount()
+        {
+            return _enterpriseTypes.Count(x => x.IsActive);
+        }
     }
 }

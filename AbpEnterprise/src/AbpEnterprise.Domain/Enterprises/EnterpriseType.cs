@@ -20,7 +20,7 @@ namespace AbpEnterprise.Enterprises
         public Guid EnterpriseIndustryId { get; private set; }
 
         // Navigation property
-        public EnterpriseIndustry EnterpriseIndustry { get; private set; }
+        //public EnterpriseIndustry EnterpriseIndustry { get; private set; }
 
         protected EnterpriseType()
         {
@@ -60,7 +60,7 @@ namespace AbpEnterprise.Enterprises
         {
             IsActive = true;
         }
-
+       
         public void Deactivate()
         {
             IsActive = false;

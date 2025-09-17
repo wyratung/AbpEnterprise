@@ -8,7 +8,6 @@ using Volo.Abp.Application.Dtos;
 
 namespace AbpEnterprise.Enterprises
 {
-    // DTOs
     public class EnterpriseIndustryDto : FullAuditedEntityDto<Guid>
     {
         public string Name { get; set; }
@@ -25,10 +24,9 @@ namespace AbpEnterprise.Enterprises
         public string Description { get; set; }
         public bool IsActive { get; set; }
         public Guid EnterpriseIndustryId { get; set; }
-        public string EnterpriseIndustryName { get; set; }
     }
 
-    // Create/Update DTOs
+    // Create/Update DTOs cho Industry
     public class CreateEnterpriseIndustryDto
     {
         [Required]
@@ -41,7 +39,7 @@ namespace AbpEnterprise.Enterprises
 
         [StringLength(EnterpriseIndustryConsts.MaxDescriptionLength)]
         public string Description { get; set; }
-
+        public List<CreateEnterpriseTypeDto> EnterpriseTypes { get; set; } = new();
     }
 
     public class UpdateEnterpriseIndustryDto
@@ -53,13 +51,12 @@ namespace AbpEnterprise.Enterprises
         [StringLength(EnterpriseIndustryConsts.MaxDescriptionLength)]
         public string Description { get; set; }
 
+        public int SortOrder { get; set; }
     }
 
+    // DTOs cho EnterpriseType - chỉ được sử dụng thông qua Industry
     public class CreateEnterpriseTypeDto
     {
-        [Required]
-        public Guid EnterpriseIndustryId { get; set; }
-
         [Required]
         [StringLength(EnterpriseTypeConsts.MaxNameLength)]
         public string Name { get; set; }
@@ -82,7 +79,6 @@ namespace AbpEnterprise.Enterprises
 
         [StringLength(EnterpriseTypeConsts.MaxDescriptionLength)]
         public string Description { get; set; }
-
     }
 
     // Get List DTOs
@@ -90,12 +86,6 @@ namespace AbpEnterprise.Enterprises
     {
         public string Filter { get; set; }
         public bool? IsActive { get; set; }
-    }
-
-    public class GetEnterpriseTypesInput : PagedAndSortedResultRequestDto
-    {
-        public Guid? EnterpriseIndustryId { get; set; }
-        public string Filter { get; set; }
-        public bool? IsActive { get; set; }
+        public bool IncludeTypes { get; set; } = false;
     }
 }

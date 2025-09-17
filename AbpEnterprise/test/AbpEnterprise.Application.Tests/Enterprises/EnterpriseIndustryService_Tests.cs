@@ -61,9 +61,9 @@ namespace AbpEnterprise.Enterprises
             updated.Name.ShouldBe(updateInput.Name);
             updated.Description.ShouldBe(updateInput.Description);
         }
-        //write code test cased for method GetWithDetailsAsync
+        //write code test cased for method ActivateEnterpriseTypeAsync
         [Fact]
-        public async Task Should_Get_EnterpriseIndustry_With_Details()
+        public async Task Should_Activate_EnterpriseIndustry()
         {
             var input = new CreateEnterpriseIndustryDto
             {
@@ -72,14 +72,15 @@ namespace AbpEnterprise.Enterprises
                 Description = "This is a test industry"
             };
             var created = await enterpriseIndustryAppService.CreateAsync(input);
-            var result = await enterpriseIndustryAppService.GetWithDetailsAsync(created.Id);
-            result.ShouldNotBeNull();
-            result.Name.ShouldBe(input.Name);
-            result.Code.ShouldBe(input.Code);
-            result.Description.ShouldBe(input.Description);
-            result.IsActive.ShouldBeTrue();
-            result.EnterpriseTypes.ShouldBeEmpty();
+            await enterpriseIndustryAppService.DeactivateIndustryAsync(created.Id);
+            var deactivated = await enterpriseIndustryAppService.GetAsync(created.Id);
+            deactivated.IsActive.ShouldBeFalse();
+            await enterpriseIndustryAppService.ActivateIndustryAsync(created.Id);
+            var activated = await enterpriseIndustryAppService.GetAsync(created.Id);
+            activated.IsActive.ShouldBeTrue();
         }
+
+
         //write code test cased for method GetActiveListAsync
         //[Fact]
         //public async Task Should_Get_Active_EnterpriseIndustries()

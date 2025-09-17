@@ -34,7 +34,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
 
             // Configure relationship
             b.HasMany(x => x.EnterpriseTypes)
-                .WithOne(x => x.EnterpriseIndustry)
+                .WithOne()
                 .HasForeignKey(x => x.EnterpriseIndustryId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

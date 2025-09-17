@@ -25,8 +25,8 @@ public class AbpEnterpriseApplicationAutoMapperProfile : Profile
         CreateMap<UpdateEnterpriseIndustryDto, EnterpriseIndustry>();
 
         // EnterpriseType mappings
-        CreateMap<EnterpriseType, EnterpriseTypeDto>()
-            .ForMember(dest => dest.EnterpriseIndustryName, opt => opt.MapFrom(src => src.EnterpriseIndustry.Name));
+        CreateMap<EnterpriseType, EnterpriseTypeDto>();
+            
         CreateMap<CreateEnterpriseTypeDto, EnterpriseType>();
         CreateMap<UpdateEnterpriseTypeDto, EnterpriseType>();
     }
