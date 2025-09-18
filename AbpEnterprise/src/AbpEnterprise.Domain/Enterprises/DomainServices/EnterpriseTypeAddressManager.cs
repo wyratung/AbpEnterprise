@@ -38,7 +38,7 @@ namespace AbpEnterprise.Enterprises.DomainServices
             var existingAddress = await _addressRepository.FindByLocationAsync(street, city, state, country, zipCode);
             if (existingAddress != null)
             {
-                throw new UserFriendlyException(L["AddressAlreadyExists"]);
+                throw new UserFriendlyException("AddressAlreadyExists");
             }
 
             return new EnterpriseTypeAddress(

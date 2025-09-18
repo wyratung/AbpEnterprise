@@ -40,9 +40,9 @@ public class EnterpriseTypeAddress : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void RemoveEnterpriseType(Guid enterpriseTypeId)
+    public void RemoveEnterpriseType(Guid enterpriseTypeId, Guid enterpriseAddressId)
     {
-        var mapping = _typeMappings.FirstOrDefault(x => x.EnterpriseTypeId == enterpriseTypeId);
+        var mapping = _typeMappings.FirstOrDefault(x => x.EnterpriseTypeId == enterpriseTypeId && x.EnterpriseTypeAddressId == enterpriseAddressId);
         if (mapping != null)
         {
             _typeMappings.Remove(mapping);

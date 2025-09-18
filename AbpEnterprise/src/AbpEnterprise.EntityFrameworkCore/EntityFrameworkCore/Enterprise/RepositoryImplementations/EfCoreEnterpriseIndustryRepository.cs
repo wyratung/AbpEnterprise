@@ -43,6 +43,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
             }
 
             return await query
+                .OrderBy(x => x.Name)
                 .PageBy(skipCount, maxResultCount)
                 .ToListAsync();
         }

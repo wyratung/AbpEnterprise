@@ -61,6 +61,20 @@ public class AbpEnterprisePermissionDefinitionProvider : PermissionDefinitionPro
         //typesPermission.AddChild(
         //    AbpEnterprisePermissions.EnterpriseTypes.Delete,
         //    L("Permission:EnterpriseTypes.Delete"));
+
+        // Enterprise Type Addresses
+        var enterpriseTypeAddressesPermission = myGroup.AddPermission(
+            AbpEnterprisePermissions.EnterpriseTypeAddresses.Default,
+            L("Permission:EnterpriseTypeAddresses"));
+        enterpriseTypeAddressesPermission.AddChild(
+            AbpEnterprisePermissions.EnterpriseTypeAddresses.Create,
+            L("Permission:EnterpriseTypeAddresses.Create"));
+        enterpriseTypeAddressesPermission.AddChild(
+            AbpEnterprisePermissions.EnterpriseTypeAddresses.Edit,
+            L("Permission:EnterpriseTypeAddresses.Edit"));
+        enterpriseTypeAddressesPermission.AddChild(
+            AbpEnterprisePermissions.EnterpriseTypeAddresses.Delete,
+            L("Permission:EnterpriseTypeAddresses.Delete"));
     }
 
     private static LocalizableString L(string name)

@@ -20,6 +20,16 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
         {
         }
 
+        // write code Add new EnterpriseTypeAddressMapping and save it to database
+        public async Task<EnterpriseTypeAddressMapping> AddAsync(
+            EnterpriseTypeAddressMapping entity,
+            CancellationToken cancellationToken = default)
+        {
+            var dbContext = await GetDbContextAsync();
+            var result = await dbContext.Set<EnterpriseTypeAddressMapping>().AddAsync(entity, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return result.Entity;
+        }
         public async Task<EnterpriseTypeAddressMapping> FindByEnterpriseTypeAndAddressAsync(
             Guid enterpriseTypeId,
             Guid enterpriseTypeAddressId,
@@ -40,10 +50,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
             var query = await GetQueryableAsync();
 
             query = query
-                .Where(x => x.EnterpriseTypeId == enterpriseTypeId)
-                .WhereIf(isActive.HasValue, x => x.IsActive == isActive.Value)
-                .OrderBy(x => x.Priority)
-                .ThenBy(x => x.CreationTime);
+                .Where(x => x.EnterpriseTypeId == enterpriseTypeId);
 
             return await query.ToListAsync(cancellationToken);
         }
@@ -56,10 +63,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
             var query = await GetQueryableAsync();
 
             query = query
-                .Where(x => x.EnterpriseTypeAddressId == enterpriseTypeAddressId)
-                .WhereIf(isActive.HasValue, x => x.IsActive == isActive.Value)
-                .OrderBy(x => x.Priority)
-                .ThenBy(x => x.CreationTime);
+                .Where(x => x.EnterpriseTypeAddressId == enterpriseTypeAddressId);
 
             return await query.ToListAsync(cancellationToken);
         }
@@ -72,119 +76,9 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
             var now = DateTime.Now;
 
             query = query.Where(x =>
-                x.EnterpriseTypeId == enterpriseTypeId &&
-                x.IsActive &&
-                (!x.StartDate.HasValue || x.StartDate <= now) &&
-                (!x.EndDate.HasValue || x.EndDate >= now))
-                .OrderBy(x => x.Priority)
-                .ThenBy(x => x.CreationTime);
+                x.EnterpriseTypeId == enterpriseTypeId);
 
             return await query.ToListAsync(cancellationToken);
-        }
-
-        public async Task<EnterpriseTypeAddressMapping> FindHeadquartersByEnterpriseTypeAsync(
-            Guid enterpriseTypeId,
-            CancellationToken cancellationToken = default)
-        {
-            var query = await GetQueryableAsync();
-            return await query.FirstOrDefaultAsync(x =>
-                x.EnterpriseTypeId == enterpriseTypeId &&
-                x.AddressType == AddressType.Headquarters &&
-                x.IsActive,
-                cancellationToken);
-        }
-
-        public async Task<int> GetActiveCountByEnterpriseTypeAsync(Guid enterpriseTypeId, CancellationToken cancellationToken = default)
-        {
-            var query = await GetQueryableAsync();
-            var now = DateTime.Now;
-
-            return await query.CountAsync(x =>
-                x.EnterpriseTypeId == enterpriseTypeId &&
-                x.IsActive &&
-                (!x.StartDate.HasValue || x.StartDate <= now) &&
-                (!x.EndDate.HasValue || x.EndDate >= now),
-                cancellationToken);
-        }
-
-        public async Task<List<EnterpriseTypeAddressMapping>> GetListAsync(
-            string sorting = null,
-            int maxResultCount = int.MaxValue,
-            int skipCount = 0,
-            Guid? enterpriseTypeId = null,
-            Guid? enterpriseTypeAddressId = null,
-            bool? isActive = null,
-            bool? isCurrentlyActive = null,
-            AddressType? addressType = null,
-            CancellationToken cancellationToken = default)
-        {
-            var query = await GetQueryableAsync();
-
-            query = query
-                .WhereIf(enterpriseTypeId.HasValue, x => x.EnterpriseTypeId == enterpriseTypeId)
-                .WhereIf(enterpriseTypeAddressId.HasValue, x => x.EnterpriseTypeAddressId == enterpriseTypeAddressId)
-                .WhereIf(isActive.HasValue, x => x.IsActive == isActive.Value)
-                .WhereIf(addressType.HasValue, x => x.AddressType == addressType.Value);
-
-            if (isCurrentlyActive.HasValue)
-            {
-                var now = DateTime.Now;
-                if (isCurrentlyActive.Value)
-                {
-                    query = query.Where(x => x.IsActive &&
-                        (!x.StartDate.HasValue || x.StartDate <= now) &&
-                        (!x.EndDate.HasValue || x.EndDate >= now));
-                }
-                else
-                {
-                    query = query.Where(x => !x.IsActive ||
-                        (x.StartDate.HasValue && x.StartDate > now) ||
-                        (x.EndDate.HasValue && x.EndDate < now));
-                }
-            }
-
-            query = query
-                .OrderBy(sorting.IsNullOrEmpty() ? nameof(EnterpriseTypeAddressMapping.Priority) : sorting)
-                .Skip(skipCount)
-                .Take(maxResultCount);
-
-            return await query.ToListAsync(cancellationToken);
-        }
-
-        public async Task<long> GetCountAsync(
-            Guid? enterpriseTypeId = null,
-            Guid? enterpriseTypeAddressId = null,
-            bool? isActive = null,
-            bool? isCurrentlyActive = null,
-            AddressType? addressType = null,
-            CancellationToken cancellationToken = default)
-        {
-            var query = await GetQueryableAsync();
-
-            query = query
-                .WhereIf(enterpriseTypeId.HasValue, x => x.EnterpriseTypeId == enterpriseTypeId)
-                .WhereIf(enterpriseTypeAddressId.HasValue, x => x.EnterpriseTypeAddressId == enterpriseTypeAddressId)
-                .WhereIf(isActive.HasValue, x => x.IsActive == isActive.Value)
-                .WhereIf(addressType.HasValue, x => x.AddressType == addressType.Value);
-
-            if (isCurrentlyActive.HasValue)
-            {
-                var now = DateTime.Now;
-                if (isCurrentlyActive.Value)
-                {
-                    query = query.Where(x => x.IsActive &&
-                        (!x.StartDate.HasValue || x.StartDate <= now) &&
-                        (!x.EndDate.HasValue || x.EndDate >= now));
-                }
-                else
-                {
-                    query = query.Where(x => !x.IsActive ||
-                        (x.StartDate.HasValue && x.StartDate > now) ||
-                        (x.EndDate.HasValue && x.EndDate < now));
-                }
-            }
-
-            return await query.CountAsync(cancellationToken);
-        }
+        }      
     }
 }

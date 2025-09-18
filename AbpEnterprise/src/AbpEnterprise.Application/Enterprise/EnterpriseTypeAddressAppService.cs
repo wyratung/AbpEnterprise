@@ -1,6 +1,8 @@
 ﻿using AbpEnterprise.Enterprises;
 using AbpEnterprise.Enterprises.DomainServices;
 using AbpEnterprise.Enterprises.Interfaces;
+using AbpEnterprise.Permissions;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,13 +32,14 @@ namespace AbpEnterprise.Enterprise
             _addressManager = addressManager;
             _addressRepository = repository;
 
-            //GetPolicyName = YourProjectPermissions.EnterpriseTypeAddresses.Default;
-            //GetListPolicyName = YourProjectPermissions.EnterpriseTypeAddresses.Default;
-            //CreatePolicyName = YourProjectPermissions.EnterpriseTypeAddresses.Create;
-            //UpdatePolicyName = YourProjectPermissions.EnterpriseTypeAddresses.Edit;
-            //DeletePolicyName = YourProjectPermissions.EnterpriseTypeAddresses.Delete;
+            GetPolicyName = AbpEnterprisePermissions.EnterpriseTypeAddresses.Default;
+            GetListPolicyName = AbpEnterprisePermissions.EnterpriseTypeAddresses.Default;
+            CreatePolicyName = AbpEnterprisePermissions.EnterpriseTypeAddresses.Create;
+            UpdatePolicyName = AbpEnterprisePermissions.EnterpriseTypeAddresses.Edit;
+            DeletePolicyName = AbpEnterprisePermissions.EnterpriseTypeAddresses.Delete;
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseTypeAddresses.Create)]
         public override async Task<EnterpriseTypeAddressDto> CreateAsync(CreateUpdateEnterpriseTypeAddressDto input)
         {
             var address = await _addressManager.CreateAsync(
@@ -55,6 +58,7 @@ namespace AbpEnterprise.Enterprise
             return ObjectMapper.Map<EnterpriseTypeAddress, EnterpriseTypeAddressDto>(result);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseTypeAddresses.Edit)]
         public override async Task<EnterpriseTypeAddressDto> UpdateAsync(Guid id, CreateUpdateEnterpriseTypeAddressDto input)
         {
             var address = await Repository.GetAsync(id);
@@ -88,12 +92,14 @@ namespace AbpEnterprise.Enterprise
             return query;
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseTypeAddresses.Default)]
         public virtual async Task<bool> CanDeleteAsync(Guid id)
         {
             await CheckGetPolicyAsync();
             return await _addressManager.CanDeleteAsync(id);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseTypeAddresses.Delete)]
         protected override async Task DeleteByIdAsync(Guid id)
         {
             var canDelete = await _addressManager.CanDeleteAsync(id);

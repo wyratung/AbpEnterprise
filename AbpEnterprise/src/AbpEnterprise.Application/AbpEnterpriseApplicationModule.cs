@@ -1,10 +1,11 @@
-﻿using Volo.Abp.PermissionManagement;
-using Volo.Abp.SettingManagement;
-using Volo.Abp.Account;
-using Volo.Abp.Identity;
+﻿using Volo.Abp.Account;
+using Volo.Abp.Auditing;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
+using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
+using Volo.Abp.PermissionManagement;
+using Volo.Abp.SettingManagement;
 using Volo.Abp.TenantManagement;
 
 namespace AbpEnterprise;
@@ -26,6 +27,12 @@ public class AbpEnterpriseApplicationModule : AbpModule
         Configure<AbpAutoMapperOptions>(options =>
         {
             options.AddMaps<AbpEnterpriseApplicationModule>();
+        });
+        Configure<AbpAuditingOptions>(options =>
+        {
+            options.IsEnabled = true;                  
+            options.IsEnabledForGetRequests = true;    
+            options.AlwaysLogOnException = true;       
         });
     }
 }

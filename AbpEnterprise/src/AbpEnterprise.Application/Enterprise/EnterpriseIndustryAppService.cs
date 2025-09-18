@@ -2,7 +2,9 @@
 using AbpEnterprise.Enterpries.EnterpriseInterfaces;
 using AbpEnterprise.Enterprises;
 using AbpEnterprise.Enterprises.DomainServices;
+using AbpEnterprise.Permissions;
 using AutoMapper.Internal.Mappers;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,14 +34,13 @@ namespace AbpEnterprise.Enterprise
             _repository = repository;
             _enterpriseIndustryManager = enterpriseIndustryManager;
 
-            //GetPolicyName = EnterprisePermissions.EnterpriseIndustries.Default;
-            //GetListPolicyName = EnterprisePermissions.EnterpriseIndustries.Default;
-            //CreatePolicyName = EnterprisePermissions.EnterpriseIndustries.Create;
-            //UpdatePolicyName = EnterprisePermissions.EnterpriseIndustries.Update;
-            //DeletePolicyName = EnterprisePermissions.EnterpriseIndustries.Delete;
+            GetPolicyName = AbpEnterprisePermissions.EnterpriseIndustries.Default;
+            GetListPolicyName = AbpEnterprisePermissions.EnterpriseIndustries.Default;
+            CreatePolicyName = AbpEnterprisePermissions.EnterpriseIndustries.Create;
+            UpdatePolicyName = AbpEnterprisePermissions.EnterpriseIndustries.Update;
+            DeletePolicyName = AbpEnterprisePermissions.EnterpriseIndustries.Delete;
         }
 
-        // ===== INDUSTRY OPERATIONS =====
         protected override async Task<IQueryable<EnterpriseIndustry>> CreateFilteredQueryAsync(GetEnterpriseIndustriesInput input)
         {
             var query = await ReadOnlyRepository.GetQueryableAsync();
@@ -53,7 +54,7 @@ namespace AbpEnterprise.Enterprise
                 .WhereIf(!input.Filter.IsNullOrWhiteSpace(), x => x.Name.Contains(input.Filter) || x.Code.Contains(input.Filter))
                 .WhereIf(input.IsActive.HasValue, x => x.IsActive == input.IsActive.Value);
         }
-
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Default)]
         public async Task<EnterpriseIndustryDto> GetWithTypesAsync(Guid id)
         {
             await CheckGetPolicyAsync();
@@ -62,6 +63,7 @@ namespace AbpEnterprise.Enterprise
             return await MapToGetOutputDtoAsync(entity);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Create)]
         public override async Task<EnterpriseIndustryDto> CreateAsync(CreateEnterpriseIndustryDto input)
         {
             await CheckCreatePolicyAsync();
@@ -72,7 +74,6 @@ namespace AbpEnterprise.Enterprise
                 input.Description
             );
 
-            // Tạo EnterpriseTypes nếu có
             foreach (var typeInput in input.EnterpriseTypes)
             {
                 await _enterpriseIndustryManager.CreateEnterpriseTypeAsync(
@@ -88,6 +89,7 @@ namespace AbpEnterprise.Enterprise
             return await MapToGetOutputDtoAsync(entity);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Update)]
         public async Task ActivateIndustryAsync(Guid id)
         {
             await CheckUpdatePolicyAsync();
@@ -97,6 +99,7 @@ namespace AbpEnterprise.Enterprise
             await Repository.UpdateAsync(entity);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Update)]
         public async Task DeactivateIndustryAsync(Guid id)
         {
             await CheckUpdatePolicyAsync();
@@ -106,6 +109,7 @@ namespace AbpEnterprise.Enterprise
             await Repository.UpdateAsync(entity);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Default)]
         public async Task<List<EnterpriseIndustryDto>> GetActiveIndustriesAsync()
         {
             await CheckGetPolicyAsync();
@@ -114,7 +118,7 @@ namespace AbpEnterprise.Enterprise
             return ObjectMapper.Map<List<EnterpriseIndustry>, List<EnterpriseIndustryDto>>(entities);
         }
 
-        // ===== ENTERPRISE TYPE OPERATIONS - VIA AGGREGATE ROOT =====
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Create)]
         public async Task<EnterpriseTypeDto> AddEnterpriseTypeAsync(Guid industryId, CreateEnterpriseTypeDto input)
         {
             await CheckCreatePolicyAsync(); // Sử dụng permission của Industry
@@ -134,6 +138,7 @@ namespace AbpEnterprise.Enterprise
             return ObjectMapper.Map<EnterpriseType, EnterpriseTypeDto>(enterpriseType);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Update)]
         public async Task<EnterpriseTypeDto> UpdateEnterpriseTypeAsync(Guid industryId, Guid typeId, UpdateEnterpriseTypeDto input)
         {
             await CheckUpdatePolicyAsync();
@@ -155,6 +160,7 @@ namespace AbpEnterprise.Enterprise
             return ObjectMapper.Map<EnterpriseType, EnterpriseTypeDto>(enterpriseType);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Delete)]
         public async Task RemoveEnterpriseTypeAsync(Guid industryId, Guid typeId)
         {
             await CheckDeletePolicyAsync();
@@ -165,6 +171,7 @@ namespace AbpEnterprise.Enterprise
             await _repository.UpdateAsync(industry);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Update)]
         public async Task ActivateEnterpriseTypeAsync(Guid industryId, Guid typeId)
         {
             await CheckUpdatePolicyAsync();
@@ -181,6 +188,7 @@ namespace AbpEnterprise.Enterprise
             await _repository.UpdateAsync(industry);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Update)]
         public async Task DeactivateEnterpriseTypeAsync(Guid industryId, Guid typeId)
         {
             await CheckUpdatePolicyAsync();
@@ -197,6 +205,7 @@ namespace AbpEnterprise.Enterprise
             await _repository.UpdateAsync(industry);
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Default)]
         public async Task<List<EnterpriseTypeDto>> GetEnterpriseTypesByIndustryAsync(Guid industryId)
         {
             await CheckGetPolicyAsync();
@@ -206,6 +215,7 @@ namespace AbpEnterprise.Enterprise
                 industry.EnterpriseTypes.OrderBy(x => x.Name).ToList());
         }
 
+        [Authorize(AbpEnterprisePermissions.EnterpriseIndustries.Default)]
         public async Task<EnterpriseTypeDto> GetEnterpriseTypeAsync(Guid industryId, Guid typeId)
         {
             await CheckGetPolicyAsync();

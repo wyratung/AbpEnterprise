@@ -27,13 +27,15 @@ public static class AbpEnterprisePermissions
         public const string Create = Default + ".Create";
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";
+        public const string Edit = Default + ".Edit";
     }
 
-    //public static class EnterpriseTypes
-    //{
-    //    public const string Default = GroupName + ".EnterpriseTypes";
-    //    public const string Create = Default + ".Create";
-    //    public const string Update = Default + ".Update";
-    //    public const string Delete = Default + ".Delete";
-    //}
+    public static class EnterpriseTypeAddresses
+    {
+        public const string Default = GroupName + ".EnterpriseTypes";
+        public const string Create = Default + ".Create";
+        public const string Update = Default + ".Update";
+        public const string Delete = Default + ".Delete";
+        public const string Edit = Default + ".Edit";
+    }
 }

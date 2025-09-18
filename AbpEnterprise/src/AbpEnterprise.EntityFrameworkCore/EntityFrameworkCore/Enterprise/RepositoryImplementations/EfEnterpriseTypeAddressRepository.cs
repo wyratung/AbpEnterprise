@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.Aspects
+using System.Linq.Dynamic.Core;
 
 namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
 {
@@ -79,7 +79,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
             var dbContext = await GetDbContextAsync();
 
             return await dbContext.Set<EnterpriseTypeAddressMapping>()
-                .Where(x => x.EnterpriseTypeAddressId == addressId && x.IsActive)
+                .Where(x => x.EnterpriseTypeAddressId == addressId)
                 .CountAsync(cancellationToken);
         }
 
@@ -88,7 +88,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
             var dbContext = await GetDbContextAsync();
 
             var mappingQuery = dbContext.Set<EnterpriseTypeAddressMapping>()
-                .Where(x => x.EnterpriseTypeId == enterpriseTypeId && x.IsActive)
+                .Where(x => x.EnterpriseTypeId == enterpriseTypeId)
                 .Select(x => x.EnterpriseTypeAddressId);
 
             var query = await GetQueryableAsync();
