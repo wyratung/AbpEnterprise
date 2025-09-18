@@ -24,7 +24,6 @@ namespace AbpEnterprise.Enterprises
         {
         }
 
-        // Constructor cho việc tạo mới
         internal EnterpriseIndustry(
             Guid id,
             string name,

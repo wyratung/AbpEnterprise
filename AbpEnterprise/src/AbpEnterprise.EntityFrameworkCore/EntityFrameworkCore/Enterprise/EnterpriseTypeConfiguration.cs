@@ -31,6 +31,11 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise
             b.HasIndex(x => new { x.EnterpriseIndustryId, x.Code }).IsUnique();
             b.HasIndex(x => x.Name);
             b.HasIndex(x => x.IsActive);
+
+            b.HasMany(x => x.AddressMappings)
+                .WithOne()
+                .HasForeignKey(x => x.EnterpriseTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

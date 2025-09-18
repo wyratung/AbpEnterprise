@@ -12,15 +12,40 @@ namespace AbpEnterprise.Enterprises
 {
     public class EnterpriseType : FullAuditedEntity<Guid>
     {
-        public string Name { get; private set; }
-        public string Code { get; private set; }
-        public string Description { get; private set; }
+        public string Name { get; private set; } = null!;
+        public string Code { get; private set; } = null!;
+        public string? Description { get; private set; }
         public bool IsActive { get; private set; }
 
         public Guid EnterpriseIndustryId { get; private set; }
 
-        // Navigation property
-        //public EnterpriseIndustry EnterpriseIndustry { get; private set; }
+        private readonly List<EnterpriseTypeAddressMapping> _addressMappings = new();
+        public IReadOnlyCollection<EnterpriseTypeAddressMapping> AddressMappings => _addressMappings.AsReadOnly();
+
+        public void AddAddress(EnterpriseTypeAddress address)
+        {
+            Check.NotNull(address, nameof(address));
+            
+            if (_addressMappings.Any(x => x.EnterpriseTypeAddressId == address.Id))
+            {
+                return; // Address already added
+            }
+
+            _addressMappings.Add(new EnterpriseTypeAddressMapping(
+                Guid.NewGuid(),
+                this.Id,
+                address.Id
+            ));
+        }
+
+        public void RemoveAddress(Guid addressId)
+        {
+            var mapping = _addressMappings.FirstOrDefault(x => x.EnterpriseTypeAddressId == addressId);
+            if (mapping != null)
+            {
+                _addressMappings.Remove(mapping);
+            }
+        }
 
         protected EnterpriseType()
         {

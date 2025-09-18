@@ -1,6 +1,7 @@
 using AbpEnterprise.Books;
 using AbpEnterprise.Enterprises;
 using AutoMapper;
+using Volo.Abp.AutoMapper;
 
 namespace AbpEnterprise;
 
@@ -29,5 +30,8 @@ public class AbpEnterpriseApplicationAutoMapperProfile : Profile
             
         CreateMap<CreateEnterpriseTypeDto, EnterpriseType>();
         CreateMap<UpdateEnterpriseTypeDto, EnterpriseType>();
+
+        // EnterpriseIndustry
+       
     }
 }

@@ -33,6 +33,8 @@ public class AbpEnterpriseDbContext :
     public DbSet<Book> Books { get; set; }
     public DbSet<EnterpriseType> EnterpriseTypes { get; set; }
     public DbSet<EnterpriseIndustry> EnterpriseIndustries { get; set; }
+    public DbSet<EnterpriseTypeAddress> EnterpriseTypeAddresses { get; set; }
+    public DbSet<EnterpriseTypeAddressMapping> EnterpriseTypeAddressMappings { get; set; }
     public DbSet<Author> Authors { get; set; }
 
     #region Entities from the modules
@@ -111,6 +113,8 @@ public class AbpEnterpriseDbContext :
         });
         builder.ApplyConfiguration(new EnterpriseTypeConfiguration());
         builder.ApplyConfiguration(new EnterpriseIndustryConfiguration());
+        builder.ApplyConfiguration(new EnterpriseTypeAddressConfiguration());
+        builder.ApplyConfiguration(new EnterpriseTypeAddressMappingConfiguration());
         //builder.ApplyConfigurationsFromAssembly(typeof(AbpEnterpriseDbContext).Assembly);
 
         /* Configure your own tables/entities inside here */
