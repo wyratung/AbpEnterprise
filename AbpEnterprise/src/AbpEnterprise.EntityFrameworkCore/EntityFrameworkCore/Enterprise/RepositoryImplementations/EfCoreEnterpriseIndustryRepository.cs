@@ -34,8 +34,7 @@ namespace AbpEnterprise.EntityFrameworkCore.Enterprise.RepositoryImplementations
         {
             var dbSet = await GetDbSetAsync();
             var query = dbSet
-                .WhereIf(!filter.IsNullOrWhiteSpace(), x => x.Name.Contains(filter) || x.Code.Contains(filter))
-                .WhereIf(isActive.HasValue, x => x.IsActive == isActive.Value);
+                .WhereIf(!filter.IsNullOrWhiteSpace(), x => x.Name.Contains(filter) || x.Code.Contains(filter));
 
             if (includeDetails)
             {

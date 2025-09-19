@@ -32,6 +32,8 @@ public class AbpEnterpriseApplicationAutoMapperProfile : Profile
         CreateMap<UpdateEnterpriseTypeDto, EnterpriseType>();
 
         // EnterpriseIndustry
-       
+        CreateMap<EnterpriseTypeAddress, EnterpriseTypeAddressDto>();
+
+
     }
 }

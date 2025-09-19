@@ -30,8 +30,10 @@ namespace AbpEnterprise.DataSeeder
         private readonly IPermissionManager _permissionManager;
         private readonly EnterpriseIndustryManager _enterpriseIndustryManager;
         private readonly EnterpriseTypeAddressManager _addressManager;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public EnterpriseDataSeedContributor(
+            IUnitOfWorkManager unitOfWorkManager,
             IGuidGenerator guidGenerator,
             IEnterpriseIndustryRepository enterpriseIndustryRepository,
             IEnterpriseTypeAddressRepository addressRepository,
@@ -51,9 +53,10 @@ namespace AbpEnterprise.DataSeeder
             _permissionManager = permissionManager;
             _enterpriseIndustryManager = enterpriseIndustryManager;
             _addressManager = addressManager;
+            _unitOfWorkManager = unitOfWorkManager;
         }
 
-        [UnitOfWork]
+        //[UnitOfWork]
         public async Task SeedAsync(DataSeedContext context)
         {
             await SeedRolesAsync();
@@ -178,7 +181,7 @@ namespace AbpEnterprise.DataSeeder
 
             // Create Admin user
             await CreateUserIfNotExistsAsync(
-                userName: "admin",
+                userName: "admin1",
                 email: "admin@yourproject.com",
                 password: "Admin123!",
                 roleNames: new[] { "Admin" },
@@ -286,7 +289,9 @@ namespace AbpEnterprise.DataSeeder
         private async Task SeedEnterpriseDataAsync()
         {
             // Create Enterprise Industries
-            var technologyIndustryId = _guidGenerator.Create();
+            using (var uow = _unitOfWorkManager.Begin())
+            {     
+                var technologyIndustryId = _guidGenerator.Create();
             var manufacturingIndustryId = _guidGenerator.Create();
             var serviceIndustryId = _guidGenerator.Create();
             var retailIndustryId = _guidGenerator.Create();
@@ -350,59 +355,60 @@ namespace AbpEnterprise.DataSeeder
                 await _enterpriseIndustryRepository.UpdateAsync(retailIndustry);
             }
 
-            // Create Comprehensive Address Data
-            if (!await _addressRepository.AnyAsync())
-            {
-                var addresses = new List<EnterpriseTypeAddress>();
+                // Create Comprehensive Address Data
+                if (!await _addressRepository.AnyAsync())
+                {
+                    var addresses = new List<EnterpriseTypeAddress>();
 
-                // Technology hubs
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Silicon Valley HQ", "1 Hacker Way", "Menlo Park", "CA", "USA", "94025",
-                    "+1-650-543-4800", "contact@siliconvalley.com"));
+                    // Technology hubs
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Silicon Valley HQ", "1 Hacker Way", "Menlo Park", "CA", "USA", "94025",
+                        "+1-650-543-4800", "contact@siliconvalley.com"));
 
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Seattle Tech Center", "410 Terry Ave N", "Seattle", "WA", "USA", "98109",
-                    "+1-206-266-1000", "seattle@techcenter.com"));
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Seattle Tech Center", "410 Terry Ave N", "Seattle", "WA", "USA", "98109",
+                        "+1-206-266-1000", "seattle@techcenter.com"));
 
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Austin Innovation Hub", "500 W 2nd St", "Austin", "TX", "USA", "78701",
-                    "+1-512-474-5171", "austin@innovation.com"));
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Austin Innovation Hub", "500 W 2nd St", "Austin", "TX", "USA", "78701",
+                        "+1-512-474-5171", "austin@innovation.com"));
 
-                // Business centers
-                addresses.Add(await _addressManager.CreateAsync(
-                    "New York Financial District", "200 West Street", "New York", "NY", "USA", "10282",
-                    "+1-212-619-2000", "ny@financial.com"));
+                    // Business centers
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "New York Financial District", "200 West Street", "New York", "NY", "USA", "10282",
+                        "+1-212-619-2000", "ny@financial.com"));
 
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Chicago Business Center", "233 S Wacker Dr", "Chicago", "IL", "USA", "60606",
-                    "+1-312-875-8000", "chicago@business.com"));
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Chicago Business Center", "233 S Wacker Dr", "Chicago", "IL", "USA", "60606",
+                        "+1-312-875-8000", "chicago@business.com"));
 
-                // International offices
-                addresses.Add(await _addressManager.CreateAsync(
-                    "London European HQ", "25 Churchill Pl", "London", "England", "UK", "E14 5HU",
-                    "+44-20-7418-8000", "london@european.com"));
+                    // International offices
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "London European HQ", "25 Churchill Pl", "London", "England", "UK", "E14 5HU",
+                        "+44-20-7418-8000", "london@european.com"));
 
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Tokyo Asia Pacific", "1-1-1 Marunouchi", "Tokyo", "Tokyo", "Japan", "100-6390",
-                    "+81-3-6225-1000", "tokyo@asiapacific.com"));
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Tokyo Asia Pacific", "1-1-1 Marunouchi", "Tokyo", "Tokyo", "Japan", "100-6390",
+                        "+81-3-6225-1000", "tokyo@asiapacific.com"));
 
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Singapore Regional Office", "8 Marina View", "Singapore", "Singapore", "Singapore", "018960",
-                    "+65-6538-0000", "singapore@regional.com"));
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Singapore Regional Office", "8 Marina View", "Singapore", "Singapore", "Singapore", "018960",
+                        "+65-6538-0000", "singapore@regional.com"));
 
-                // Manufacturing facilities
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Detroit Manufacturing Plant", "2000 Town Center", "Southfield", "MI", "USA", "48075",
-                    "+1-248-948-2000", "detroit@manufacturing.com"));
+                    // Manufacturing facilities
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Detroit Manufacturing Plant", "2000 Town Center", "Southfield", "MI", "USA", "48075",
+                        "+1-248-948-2000", "detroit@manufacturing.com"));
 
-                addresses.Add(await _addressManager.CreateAsync(
-                    "Shanghai Factory", "1000 Lujiazui Ring Rd", "Shanghai", "Shanghai", "China", "200120",
-                    "+86-21-2899-5000", "shanghai@factory.com"));
+                    addresses.Add(await _addressManager.CreateAsync(
+                        "Shanghai Factory", "1000 Lujiazui Ring Rd", "Shanghai", "Shanghai", "China", "200120",
+                        "+86-21-2899-5000", "shanghai@factory.com"));
 
-                await _addressRepository.InsertManyAsync(addresses);
-
-                // Create comprehensive mappings between enterprise types and addresses
-                var industries = await _enterpriseIndustryRepository.GetListAsync(includeDetails: true);
+                    await _addressRepository.InsertManyAsync(addresses);
+                    await uow.SaveChangesAsync();
+                }
+                    // Create comprehensive mappings between enterprise types and addresses
+                var industries = await _enterpriseIndustryRepository.GetListAsync();
                 var allAddresses = await _addressRepository.GetListAsync();
 
                 foreach (var industry in industries)
